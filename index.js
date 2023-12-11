@@ -14,8 +14,9 @@ const poolV2ABI =
     "function getShares(address) view returns (uint256)",
     "function convertToAssets(uint256) view returns (uint256)"
 ]
-const provider = new ethers.BrowserProvider(window.ethereum)
-const poolV2Contract = new ethers.Contract(poolV2Address, poolV2ABI, provider)
+const ethProvider = 
+    new ethers.JsonRpcProvider("https://mainnet.infura.io/v3/ca1b1cda8d6940e6af90ec7b1b8cf84d")
+const poolV2Contract = new ethers.Contract(poolV2Address, poolV2ABI, ethProvider)
 
 // Default address
 inputEl.value = "0x2365887bBdb7fF611F54b380573a5055170fAE7D"
