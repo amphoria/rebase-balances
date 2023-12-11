@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+        <link rel="stylesheet" href="style.css">
+        <title>Rebasing Token Balances</title>
+    </head>
+    <body>
+        <h1>Rebasing Token Balances</h1>
+        <h4>Retrieve current balances for this address:</h4>
+        <input type="text" id="input-el">
+        <div id="button-div">
+            <button id="update-btn">Update Balances</button>
+        </div>
+        <h4>Current balances:-</h4>
+        <div id="balances">
+            <div class="balance" id="stakewise">
+                <div class="bal-label">Stakewise ETH:</div>
+                <div class="bal-value" id="stakewise-bal"></div>
+            </div>
+            <div class="balance" id="stablfi">
+                <div class="bal-label">Stabl.fi CASH:</div>
+                <div class="bal-value" id="stablfi-bal"></div>
+            </div>
+        </div>
+        <script type="module" src="/index.js"></script>    
+    </body>
+</html>
