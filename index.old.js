@@ -14,7 +14,7 @@ const poolV2ABI =
     "function getShares(address) view returns (uint256)",
     "function convertToAssets(uint256) view returns (uint256)"
 ]
-const provider = new ethers.BrowserProvider(window.ethereum)
+const provider = new ethers.providers.Web3Provider(window.ethereum)
 const poolV2Contract = new ethers.Contract(poolV2Address, poolV2ABI, provider)
 
 // Default address
@@ -25,7 +25,7 @@ updateBtn.addEventListener("click", getBalance)
 async function getBalance () {
     const shares = await poolV2Contract.getShares(inputEl.value)
     const assets = await poolV2Contract.convertToAssets(shares)
-    const ethBalance = ethers.formatEther(assets)
+    const ethBalance = ethers.utils.formatEther(assets)
     stakewiseBal.textContent = ethBalance
 }
 
