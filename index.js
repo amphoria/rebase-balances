@@ -2,6 +2,7 @@ import {ethers} from "ethers";
 
 const inputEl = document.getElementById("input-el")
 const updateBtn = document.getElementById("update-btn")
+const saveBtn = document.getElementById("save-btn")
 const stakewiseBal = document.getElementById("stakewise-bal")
 const stablfiBal = document.getElementById("stablfi-bal")
 
@@ -33,11 +34,14 @@ const polProvider =
 const cashContract = new ethers.Contract(cashAddress, cashABI, polProvider)
 
 // Default wallet address
-inputEl.value = "0x2365887bBdb7fF611F54b380573a5055170fAE7D"
+const cookie = getCookie("defaultAddress")
+const defaultAddress = cookie.split('=')
+inputEl.value = defaultAddress[1] 
 
-updateBtn.addEventListener("click", getBalance)
+updateBtn.addEventListener("click", getBalances)
+saveBtn.addEventListener("click", saveAddress)
 
-async function getBalance () {
+async function getBalances () {
     const shares = await poolV2Contract.getShares(inputEl.value)
     const assets = await poolV2Contract.convertToAssets(shares)
     const ethBalance = ethers.formatEther(assets)
@@ -47,4 +51,29 @@ async function getBalance () {
     const cashBalance = ethers.formatEther(balance)
     stablfiBal.textContent = cashBalance
 }
+
+function saveAddress() {
+    if (inputEl.value != "") {
+        document.cookie = "defaultAddress=" + inputEl.value
+    } else {
+        console.log("No address entered")
+    }
+}
+
+function getCookie(caddr) {
+    let address = caddr + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(address) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
 
