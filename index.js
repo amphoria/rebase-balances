@@ -35,8 +35,10 @@ const cashContract = new ethers.Contract(cashAddress, cashABI, polProvider)
 
 // Default wallet address
 const cookie = getCookie("defaultAddress")
-const defaultAddress = cookie.split('=')
-inputEl.value = defaultAddress[1] 
+if (cookie != "") {
+    const defaultAddress = cookie.split('=')
+    inputEl.value = defaultAddress[1]
+} 
 
 updateBtn.addEventListener("click", getBalances)
 saveBtn.addEventListener("click", saveAddress)
