@@ -4,8 +4,11 @@ const inputEl = document.getElementById("input-el")
 const updateBtn = document.getElementById("update-btn")
 const saveBtn = document.getElementById("save-btn")
 const stakewiseBal = document.getElementById("stakewise-bal")
+const eigenlayerOETHBal = document.getElementById("eigenlayer-oeth-bal")
 const stablfiBal = document.getElementById("stablfi-bal")
 
+// Contract addresses and ABIs
+// Stakewise V2 pool vault
 const poolV2Address = "0xac0f906e433d58fa868f936e8a43230473652885"
 const poolV2ABI = 
 [
@@ -16,10 +19,17 @@ const poolV2ABI =
     "function getShares(address) view returns (uint256)",
     "function convertToAssets(uint256) view returns (uint256)"
 ]
-const ethProvider = 
-    new ethers.JsonRpcProvider("https://mainnet.infura.io/v3/ca1b1cda8d6940e6af90ec7b1b8cf84d")
-const poolV2Contract = new ethers.Contract(poolV2Address, poolV2ABI, ethProvider)
 
+// EigenLayer OETH pool
+const eigenlayerPoolAddress = "0xa4C637e0F704745D182e4D38cAb7E7485321d059"
+const eigenlayerABI = 
+[
+    // Functions to get pool balance for a wallet
+    "function shares(address) view returns (uint256)",
+    "function sharesToUnderlyingView(uint256) view returns (uint256)"  
+]
+
+// Stabl.fi CASH token
 const cashAddress = "0x5d066d022ede10efa2717ed3d79f22f949f8c175"
 const cashABI =
 [
@@ -29,8 +39,17 @@ const cashABI =
     // Function to get balance of address
     "function balanceOf(address) view returns (uint256)"
 ]
+
+// Ethers provider objects
+const ethProvider = 
+    new ethers.JsonRpcProvider("https://mainnet.infura.io/v3/ca1b1cda8d6940e6af90ec7b1b8cf84d")
 const polProvider = 
     new ethers.JsonRpcProvider("https://polygon-mainnet.infura.io/v3/ca1b1cda8d6940e6af90ec7b1b8cf84d")
+
+// Ethers contract objects
+const poolV2Contract = new ethers.Contract(poolV2Address, poolV2ABI, ethProvider)
+const eigenlayerPoolContract = new ethers.Contract(eigenlayerPoolAddress, 
+                                                    eigenlayerABI, ethProvider)
 const cashContract = new ethers.Contract(cashAddress, cashABI, polProvider)
 
 // Default wallet address
@@ -44,10 +63,15 @@ updateBtn.addEventListener("click", getBalances)
 saveBtn.addEventListener("click", saveAddress)
 
 async function getBalances () {
-    const shares = await poolV2Contract.getShares(inputEl.value)
-    const assets = await poolV2Contract.convertToAssets(shares)
-    const ethBalance = ethers.formatEther(assets)
+    let shares = await poolV2Contract.getShares(inputEl.value)
+    let assets = await poolV2Contract.convertToAssets(shares)
+    let ethBalance = ethers.formatEther(assets)
     stakewiseBal.textContent = ethBalance
+
+    shares = await eigenlayerPoolContract.shares(inputEl.value)
+    assets = await eigenlayerPoolContract.sharesToUnderlyingView(shares)
+    ethBalance = ethers.formatEther(assets)
+    eigenlayerOETHBal.textContent = ethBalance
 
     const balance = await cashContract.balanceOf(inputEl.value)
     const cashBalance = ethers.formatEther(balance)
