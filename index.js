@@ -9,8 +9,8 @@ const stablfiBal = document.getElementById("stablfi-bal")
 
 // Contract addresses and ABIs
 // Stakewise V2 pool vault
-const poolV2Address = "0xac0f906e433d58fa868f936e8a43230473652885"
-const poolV2ABI = 
+const genesisAddress = "0xac0f906e433d58fa868f936e8a43230473652885"
+const genesisABI = 
 [
     // Some details about the contract
     "function vaultId() view returns (bytes32)",
@@ -47,7 +47,7 @@ const polProvider =
     new ethers.JsonRpcProvider("https://polygon-mainnet.infura.io/v3/ca1b1cda8d6940e6af90ec7b1b8cf84d")
 
 // Ethers contract objects
-const poolV2Contract = new ethers.Contract(poolV2Address, poolV2ABI, ethProvider)
+const genesisContract = new ethers.Contract(genesisAddress, genesisABI, ethProvider)
 const eigenlayerPoolContract = new ethers.Contract(eigenlayerPoolAddress, 
                                                     eigenlayerABI, ethProvider)
 const cashContract = new ethers.Contract(cashAddress, cashABI, polProvider)
@@ -63,12 +63,13 @@ updateBtn.addEventListener("click", getBalances)
 saveBtn.addEventListener("click", saveAddress)
 
 async function getBalances () {
-    let shares = await poolV2Contract.getShares(inputEl.value)
-    let assets = await poolV2Contract.convertToAssets(shares)
+    let shares = await genesisContract.getShares(inputEl.value)
+    let assets = await genesisContract.convertToAssets(shares)
     let ethBalance = ethers.formatEther(assets)
     stakewiseBal.textContent = ethBalance
 
     shares = await eigenlayerPoolContract.shares(inputEl.value)
+    console.log(shares)
     assets = await eigenlayerPoolContract.sharesToUnderlyingView(shares)
     ethBalance = ethers.formatEther(assets)
     eigenlayerOETHBal.textContent = ethBalance
