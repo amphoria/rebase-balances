@@ -4,6 +4,7 @@ const inputEl = document.getElementById("input-el")
 const updateBtn = document.getElementById("update-btn")
 const saveBtn = document.getElementById("save-btn")
 const stakewiseBal = document.getElementById("stakewise-bal")
+const stakewiseOSETHBal = document.getElementById("stakewise-oseth-bal")
 const eigenlayerOETHBal = document.getElementById("eigenlayer-oeth-bal")
 const stablfiBal = document.getElementById("stablfi-bal")
 
@@ -17,7 +18,9 @@ const genesisABI =
     "function version() view returns (uint8)",
     // Functions to get vault balance for a wallet
     "function getShares(address) view returns (uint256)",
-    "function convertToAssets(uint256) view returns (uint256)"
+    "function convertToAssets(uint256) view returns (uint256)",
+    // Function to get minted osETH shares for a user
+    "function osTokenPositions(address) view returns (uint256)" 
 ]
 
 // EigenLayer OETH pool
@@ -66,17 +69,21 @@ async function getBalances () {
     let shares = await genesisContract.getShares(inputEl.value)
     let assets = await genesisContract.convertToAssets(shares)
     let ethBalance = ethers.formatEther(assets)
-    stakewiseBal.textContent = ethBalance
+    stakewiseBal.innerText = ethBalance
+
+    let osethShares = await genesisContract.osTokenPositions(inputEl.value)
+    let osethBalance = ethers.formatEther(osethShares)
+    stakewiseOSETHBal.innerText = osethBalance
 
     shares = await eigenlayerPoolContract.shares(inputEl.value)
     console.log(shares)
     assets = await eigenlayerPoolContract.sharesToUnderlyingView(shares)
     ethBalance = ethers.formatEther(assets)
-    eigenlayerOETHBal.textContent = ethBalance
+    eigenlayerOETHBal.innerText = ethBalance
 
     const balance = await cashContract.balanceOf(inputEl.value)
     const cashBalance = ethers.formatEther(balance)
-    stablfiBal.textContent = cashBalance
+    stablfiBal.innerText = cashBalance
 }
 
 function saveAddress() {
