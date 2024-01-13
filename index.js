@@ -4,8 +4,10 @@ const inputEl = document.getElementById("input-el")
 const updateBtn = document.getElementById("update-btn")
 const saveBtn = document.getElementById("save-btn")
 const stakewiseBal = document.getElementById("stakewise-bal")
-const stakewiseOSETHBal = document.getElementById("stakewise-oseth-bal")
+const borrowedOSETHBal = document.getElementById("borrowed-oseth-bal")
+const walletOSETHBal = document.getElementById("wallet-oseth-bal")
 const eigenlayerOETHBal = document.getElementById("eigenlayer-oeth-bal")
+const surplusOETHBal = document.getElementById("surplus-oeth-bal")
 const stablfiBal = document.getElementById("stablfi-bal")
 
 // Contract addresses and ABIs
@@ -21,6 +23,17 @@ const genesisABI =
     "function convertToAssets(uint256) view returns (uint256)",
     // Function to get minted osETH shares for a user
     "function osTokenPositions(address) view returns (uint256)" 
+]
+
+// osETH Contract
+const osETHAddress = "0xf1C9acDc66974dFB6dEcB12aA385b9cD01190E38"
+const osETHABI = 
+[
+    // Some details about the contract
+    "function name() view returns (string)",
+    "function decimals() view returns (uint8)",
+    // Function to get balance of address
+    "function balanceOf(address) view returns (uint256)"
 ]
 
 // EigenLayer OETH pool
@@ -51,6 +64,7 @@ const polProvider =
 
 // Ethers contract objects
 const genesisContract = new ethers.Contract(genesisAddress, genesisABI, ethProvider)
+const osethContract = new ethers.Contract(osETHAddress, osETHABI, ethProvider)
 const eigenlayerPoolContract = new ethers.Contract(eigenlayerPoolAddress, 
                                                     eigenlayerABI, ethProvider)
 const cashContract = new ethers.Contract(cashAddress, cashABI, polProvider)
@@ -66,24 +80,33 @@ updateBtn.addEventListener("click", getBalances)
 saveBtn.addEventListener("click", saveAddress)
 
 async function getBalances () {
-    let shares = await genesisContract.getShares(inputEl.value)
-    let assets = await genesisContract.convertToAssets(shares)
-    let ethBalance = ethers.formatEther(assets)
-    stakewiseBal.innerText = ethBalance
+    let shares
+    let assets
+    let balanceWei
+    let balanceEth
+    let surplusOETH
 
-    let osethShares = await genesisContract.osTokenPositions(inputEl.value)
-    let osethBalance = ethers.formatEther(osethShares)
-    stakewiseOSETHBal.innerText = osethBalance
+    shares = await genesisContract.getShares(inputEl.value)
+    assets = await genesisContract.convertToAssets(shares)
+    balanceEth = ethers.formatEther(assets)
+    stakewiseBal.innerText = balanceEth
+
+    shares = await genesisContract.osTokenPositions(inputEl.value)
+    balanceEth = ethers.formatEther(shares)
+    borrowedOSETHBal.innerText = balanceEth
+
+    balanceWei = await osethContract.balanceOf(inputEl.value)
+    balanceEth = ethers.formatEther(balanceWei)
+    walletOSETHBal.innerText = balanceEth
 
     shares = await eigenlayerPoolContract.shares(inputEl.value)
-    console.log(shares)
     assets = await eigenlayerPoolContract.sharesToUnderlyingView(shares)
-    ethBalance = ethers.formatEther(assets)
-    eigenlayerOETHBal.innerText = ethBalance
+    balanceEth = ethers.formatEther(assets)
+    eigenlayerOETHBal.innerText = balanceEth
 
-    const balance = await cashContract.balanceOf(inputEl.value)
-    const cashBalance = ethers.formatEther(balance)
-    stablfiBal.innerText = cashBalance
+    balanceWei = await cashContract.balanceOf(inputEl.value)
+    balanceEth = ethers.formatEther(balanceWei)
+    stablfiBal.innerText = balanceEth
 }
 
 function saveAddress() {
