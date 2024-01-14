@@ -7,7 +7,6 @@ const stakewiseBal = document.getElementById("stakewise-bal")
 const borrowedOSETHBal = document.getElementById("borrowed-oseth-bal")
 const walletOSETHBal = document.getElementById("wallet-oseth-bal")
 const eigenlayerOETHBal = document.getElementById("eigenlayer-oeth-bal")
-const surplusOETHBal = document.getElementById("surplus-oeth-bal")
 const stablfiBal = document.getElementById("stablfi-bal")
 
 // Contract addresses and ABIs
@@ -89,24 +88,24 @@ async function getBalances () {
     shares = await genesisContract.getShares(inputEl.value)
     assets = await genesisContract.convertToAssets(shares)
     balanceEth = ethers.formatEther(assets)
-    stakewiseBal.innerText = balanceEth
+    stakewiseBal.textContent = balanceEth
 
     shares = await genesisContract.osTokenPositions(inputEl.value)
     balanceEth = ethers.formatEther(shares)
-    borrowedOSETHBal.innerText = balanceEth
+    borrowedOSETHBal.textContent = balanceEth
 
     balanceWei = await osethContract.balanceOf(inputEl.value)
     balanceEth = ethers.formatEther(balanceWei)
-    walletOSETHBal.innerText = balanceEth
+    walletOSETHBal.textContent = balanceEth
 
     shares = await eigenlayerPoolContract.shares(inputEl.value)
     assets = await eigenlayerPoolContract.sharesToUnderlyingView(shares)
     balanceEth = ethers.formatEther(assets)
-    eigenlayerOETHBal.innerText = balanceEth
+    eigenlayerOETHBal.textContent = balanceEth
 
     balanceWei = await cashContract.balanceOf(inputEl.value)
     balanceEth = ethers.formatEther(balanceWei)
-    stablfiBal.innerText = balanceEth
+    stablfiBal.textContent = balanceEth
 }
 
 function saveAddress() {
