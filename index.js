@@ -4,15 +4,16 @@ const inputEl = document.getElementById("input-el")
 const updateBtn = document.getElementById("update-btn")
 const saveBtn = document.getElementById("save-btn")
 const stakewiseBal = document.getElementById("stakewise-bal")
-const borrowedOSETHBal = document.getElementById("borrowed-oseth-bal")
+const stakewiseOSETHBal = document.getElementById("stakewise-oseth-bal")
+const chorusOneBal = document.getElementById("chorus-one-bal")
 const walletOSETHBal = document.getElementById("wallet-oseth-bal")
 const eigenlayerOETHBal = document.getElementById("eigenlayer-oeth-bal")
 const stablfiBal = document.getElementById("stablfi-bal")
 
 // Contract addresses and ABIs
-// Stakewise V2 pool vault
 const genesisAddress = "0xac0f906e433d58fa868f936e8a43230473652885"
-const genesisABI = 
+const chorusOneAddress = "0xe6d8d8aC54461b1C5eD15740EEe322043F696C08"
+const stakewiseABI = 
 [
     // Some details about the contract
     "function vaultId() view returns (bytes32)",
@@ -62,7 +63,8 @@ const polProvider =
     new ethers.JsonRpcProvider("https://polygon-mainnet.infura.io/v3/ca1b1cda8d6940e6af90ec7b1b8cf84d")
 
 // Ethers contract objects
-const genesisContract = new ethers.Contract(genesisAddress, genesisABI, ethProvider)
+const genesisContract = new ethers.Contract(genesisAddress, stakewiseABI, ethProvider)
+const chorusOneContract = new ethers.Contract(chorusOneAddress, stakewiseABI, ethProvider)
 const osethContract = new ethers.Contract(osETHAddress, osETHABI, ethProvider)
 const eigenlayerPoolContract = new ethers.Contract(eigenlayerPoolAddress, 
                                                     eigenlayerABI, ethProvider)
@@ -92,7 +94,12 @@ async function getBalances () {
 
     shares = await genesisContract.osTokenPositions(inputEl.value)
     balanceEth = ethers.formatEther(shares)
-    borrowedOSETHBal.textContent = balanceEth
+    stakewiseOSETHBal.textContent = balanceEth
+
+    shares = await chorusOneContract.getShares(inputEl.value)
+    assets = await chorusOneContract.convertToAssets(shares)
+    balanceEth = ethers.formatEther(assets)
+    chorusOneBal.textContent = balanceEth
 
     balanceWei = await osethContract.balanceOf(inputEl.value)
     balanceEth = ethers.formatEther(balanceWei)
