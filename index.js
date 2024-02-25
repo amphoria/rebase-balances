@@ -1,10 +1,13 @@
+import { StakeWiseSDK, Network } from '@stakewise/v3-sdk'
 import {ethers} from "ethers";
+
+const sdk = new StakeWiseSDK({ network: Network.Mainnet })
 
 const inputEl = document.getElementById("input-el")
 const updateBtn = document.getElementById("update-btn")
 const saveBtn = document.getElementById("save-btn")
 const stakewiseBal = document.getElementById("stakewise-bal")
-const stakewiseOSETHBal = document.getElementById("stakewise-oseth-bal")
+const genesisOSETHBal = document.getElementById("genesis-oseth-bal")
 const chorusOneBal = document.getElementById("chorus-one-bal")
 const walletOSETHBal = document.getElementById("wallet-oseth-bal")
 const eigenlayerOETHBal = document.getElementById("eigenlayer-oeth-bal")
@@ -85,7 +88,7 @@ async function getBalances () {
     let assets
     let balanceWei
     let balanceEth
-    let surplusOETH
+    let output
 
     shares = await genesisContract.getShares(inputEl.value)
     assets = await genesisContract.convertToAssets(shares)
@@ -94,7 +97,7 @@ async function getBalances () {
 
     shares = await genesisContract.osTokenPositions(inputEl.value)
     balanceEth = ethers.formatEther(shares)
-    stakewiseOSETHBal.textContent = balanceEth
+    genesisOSETHBal.textContent = balanceEth
 
     shares = await chorusOneContract.getShares(inputEl.value)
     assets = await chorusOneContract.convertToAssets(shares)
