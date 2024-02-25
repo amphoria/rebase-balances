@@ -12,6 +12,7 @@
     "vite": "^5.0.0"
   },
   "dependencies": {
+    "@stakewise/v3-sdk": "^1.1.0",
     "ethers": "^6.9.0"
   }
 }
