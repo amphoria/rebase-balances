@@ -9,6 +9,7 @@ const saveBtn = document.getElementById("save-btn")
 const stakewiseBal = document.getElementById("stakewise-bal")
 const genesisOSETHBal = document.getElementById("genesis-oseth-bal")
 const chorusOneBal = document.getElementById("chorus-one-bal")
+const chorusOneOSETHBal = document.getElementById("chorus-one-oseth-bal")
 const walletOSETHBal = document.getElementById("wallet-oseth-bal")
 const eigenlayerOETHBal = document.getElementById("eigenlayer-oeth-bal")
 const stablfiBal = document.getElementById("stablfi-bal")
@@ -103,6 +104,10 @@ async function getBalances () {
     assets = await chorusOneContract.convertToAssets(shares)
     balanceEth = ethers.formatEther(assets)
     chorusOneBal.textContent = balanceEth
+
+    shares = await chorusOneContract.osTokenPositions(inputEl.value)
+    balanceEth = ethers.formatEther(shares)
+    chorusOneOSETHBal.textContent = balanceEth
 
     balanceWei = await osethContract.balanceOf(inputEl.value)
     balanceEth = ethers.formatEther(balanceWei)
