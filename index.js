@@ -91,18 +91,23 @@ async function getBalances () {
     let balanceEth
     let output
 
-    shares = await genesisContract.getShares(inputEl.value)
-    assets = await genesisContract.convertToAssets(shares)
-    balanceEth = ethers.formatEther(assets)
+    
+    output = await sdk.vault.getStakeBalance({
+        userAddress: inputEl.value,
+        vaultAddress: genesisAddress
+    })
+    balanceEth = ethers.formatEther(output.assets)
     stakewiseBal.textContent = balanceEth
 
     shares = await genesisContract.osTokenPositions(inputEl.value)
     balanceEth = ethers.formatEther(shares)
     genesisOSETHBal.textContent = balanceEth
 
-    shares = await chorusOneContract.getShares(inputEl.value)
-    assets = await chorusOneContract.convertToAssets(shares)
-    balanceEth = ethers.formatEther(assets)
+    output = await sdk.vault.getStakeBalance({
+        userAddress: inputEl.value,
+        vaultAddress: chorusOneAddress
+    })
+    balanceEth = ethers.formatEther(output.assets)
     chorusOneBal.textContent = balanceEth
 
     shares = await chorusOneContract.osTokenPositions(inputEl.value)
