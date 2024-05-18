@@ -12,7 +12,7 @@ const chorusOneBal = document.getElementById("chorus-one-bal")
 const chorusOneOSETHBal = document.getElementById("chorus-one-oseth-bal")
 const walletOSETHBal = document.getElementById("wallet-oseth-bal")
 const eigenlayerOETHBal = document.getElementById("eigenlayer-oeth-bal")
-const stablfiBal = document.getElementById("stablfi-bal")
+const realDaiBal = document.getElementById("real-dai-bal")
 
 // Contract addresses and ABIs
 const genesisAddress = "0xac0f906e433d58fa868f936e8a43230473652885"
@@ -50,15 +50,15 @@ const eigenlayerABI =
 ]
 
 // Stabl.fi CASH token
-const cashAddress = "0x5d066d022ede10efa2717ed3d79f22f949f8c175"
-const cashABI =
-[
-    // Some details about the contract
-    "function name() view returns (string)",
-    "function decimals() view returns (uint8)",
-    // Function to get balance of address
-    "function balanceOf(address) view returns (uint256)"
-]
+// const cashAddress = "0x5d066d022ede10efa2717ed3d79f22f949f8c175"
+// const cashABI =
+// [
+//     // Some details about the contract
+//     "function name() view returns (string)",
+//     "function decimals() view returns (uint8)",
+//     // Function to get balance of address
+//     "function balanceOf(address) view returns (uint256)"
+// ]
 
 // Ethers provider objects
 const ethProvider = 
@@ -72,7 +72,7 @@ const chorusOneContract = new ethers.Contract(chorusOneAddress, stakewiseABI, et
 const osethContract = new ethers.Contract(osETHAddress, osETHABI, ethProvider)
 const eigenlayerPoolContract = new ethers.Contract(eigenlayerPoolAddress, 
                                                     eigenlayerABI, ethProvider)
-const cashContract = new ethers.Contract(cashAddress, cashABI, polProvider)
+// const cashContract = new ethers.Contract(cashAddress, cashABI, polProvider)
 
 // Default wallet address
 const cookie = getCookie("defaultAddress")
@@ -83,6 +83,27 @@ if (cookie != "") {
 
 updateBtn.addEventListener("click", getBalances)
 saveBtn.addEventListener("click", saveAddress)
+
+async function getOsethPosition(userAddr, vaultAddr) {
+    let output
+
+    output = await sdk.osToken.getBaseData()
+    const thresholdPercent = output.thresholdPercent
+
+    output = await sdk.vault.getStakeBalance({
+        userAddress: userAddr,
+        vaultAddress: vaultAddr
+    })
+    const stakeBalance = output.assets
+
+    output = await sdk.osToken.getPosition({
+        userAddress: userAddr,
+        vaultAddress: vaultAddr,
+        stakedAssets: stakeBalance,
+        thresholdPercent: thresholdPercent
+   })
+   return output
+}
 
 async function getBalances () {
     let shares
@@ -102,6 +123,8 @@ async function getBalances () {
     shares = await genesisContract.osTokenPositions(inputEl.value)
     balanceEth = ethers.formatEther(shares)
     genesisOSETHBal.textContent = balanceEth
+
+    // console.log((await getOsethPosition(inputEl.value, genesisAddress)).minted.shares)
 
     output = await sdk.vault.getStakeBalance({
         userAddress: inputEl.value,
@@ -123,9 +146,29 @@ async function getBalances () {
     balanceEth = ethers.formatEther(assets)
     eigenlayerOETHBal.textContent = balanceEth
 
-    balanceWei = await cashContract.balanceOf(inputEl.value)
-    balanceEth = ethers.formatEther(balanceWei)
-    stablfiBal.textContent = balanceEth
+    try {
+        const res = await fetch(`https://explorer.re.al/api/v2/addresses/${inputEl.value}/token-balances`)
+        if (!res.ok) {
+            throw new Error(`${res.status} ${res.statusText}`)
+        }
+        const results = await res.json()
+
+        console.log(results)
+
+        results.forEach(item => {
+            if (item.token.symbol === "DAI") {
+                balanceWei = item.value
+            }
+        })
+        balanceEth = ethers.formatEther(balanceWei)
+        realDaiBal.textContent = balanceEth
+    } catch (error) {
+        console.log(error)
+    }
+
+    // balanceWei = await cashContract.balanceOf(inputEl.value)
+    // balanceEth = ethers.formatEther(balanceWei)
+    // stablfiBal.textContent = balanceEth
 }
 
 function saveAddress() {
