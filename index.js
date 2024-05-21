@@ -13,6 +13,7 @@ const chorusOneOSETHBal = document.getElementById("chorus-one-oseth-bal")
 const walletOSETHBal = document.getElementById("wallet-oseth-bal")
 const eigenlayerOETHBal = document.getElementById("eigenlayer-oeth-bal")
 const realDaiBal = document.getElementById("real-dai-bal")
+const ustbBal = document.getElementById("real-ustb-bal")
 
 // Contract addresses and ABIs
 const genesisAddress = "0xac0f906e433d58fa868f936e8a43230473652885"
@@ -111,6 +112,7 @@ async function getBalances () {
     let balanceWei
     let balanceEth
     let output
+    let ustbWei
 
     
     output = await sdk.vault.getStakeBalance({
@@ -158,10 +160,14 @@ async function getBalances () {
         results.forEach(item => {
             if (item.token.symbol === "DAI") {
                 balanceWei = item.value
+            } else if (item.token.symbol === "USTB") {
+                ustbWei = item.value
             }
         })
         balanceEth = ethers.formatEther(balanceWei)
         realDaiBal.textContent = balanceEth
+        const ustbEth = ethers.formatEther(ustbWei)
+        ustbBal.textContent = ustbEth
     } catch (error) {
         console.log(error)
     }
