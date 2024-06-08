@@ -14,6 +14,7 @@ const walletOSETHBal = document.getElementById("wallet-oseth-bal")
 const eigenlayerOETHBal = document.getElementById("eigenlayer-oeth-bal")
 const realDaiBal = document.getElementById("real-dai-bal")
 const ustbBal = document.getElementById("real-ustb-bal")
+const arcusdBal = document.getElementById("arcana-arcusd-bal")
 
 // Contract addresses and ABIs
 const genesisAddress = "0xac0f906e433d58fa868f936e8a43230473652885"
@@ -112,8 +113,9 @@ async function getBalances () {
     let balanceWei
     let balanceEth
     let output
+    let daiWei
     let ustbWei
-
+    let arcusdWei
     
     output = await sdk.vault.getStakeBalance({
         userAddress: inputEl.value,
@@ -125,8 +127,6 @@ async function getBalances () {
     shares = await genesisContract.osTokenPositions(inputEl.value)
     balanceEth = ethers.formatEther(shares)
     genesisOSETHBal.textContent = balanceEth
-
-    // console.log((await getOsethPosition(inputEl.value, genesisAddress)).minted.shares)
 
     output = await sdk.vault.getStakeBalance({
         userAddress: inputEl.value,
@@ -159,22 +159,22 @@ async function getBalances () {
 
         results.forEach(item => {
             if (item.token.symbol === "DAI") {
-                balanceWei = item.value
+                daiWei = item.value
             } else if (item.token.symbol === "USTB") {
                 ustbWei = item.value
+            } else if (item.token.symbol === "arcUSD") {
+                arcusdWei = item.value
             }
         })
         balanceEth = ethers.formatEther(balanceWei)
         realDaiBal.textContent = balanceEth
         const ustbEth = ethers.formatEther(ustbWei)
         ustbBal.textContent = ustbEth
+        const arcusdEth = ethers.formatEther(arcusdWei)
+        arcusdBal.textContent = arcusdEth
     } catch (error) {
         console.log(error)
     }
-
-    // balanceWei = await cashContract.balanceOf(inputEl.value)
-    // balanceEth = ethers.formatEther(balanceWei)
-    // stablfiBal.textContent = balanceEth
 }
 
 function saveAddress() {
