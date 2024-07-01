@@ -155,7 +155,7 @@ async function getBalances () {
         }
         const results = await res.json()
 
-        console.log(results)
+        // console.log(results)
 
         results.forEach(item => {
             if (item.token.symbol === "DAI") {
@@ -166,7 +166,7 @@ async function getBalances () {
                 arcusdWei = item.value
             }
         })
-        balanceEth = ethers.formatEther(balanceWei)
+        balanceEth = ethers.formatEther(daiWei)
         realDaiBal.textContent = balanceEth
         const ustbEth = ethers.formatEther(ustbWei)
         ustbBal.textContent = ustbEth
