@@ -110,12 +110,14 @@ async function getOsethPosition(userAddr, vaultAddr) {
 async function getBalances () {
     let shares
     let assets
-    let balanceWei
-    let balanceEth
+    let balanceWei = 0
+    let balanceEth = 0
     let output
-    let daiWei
-    let ustbWei
-    let arcusdWei
+    let daiWei = 0
+    let ustbWei = 0
+    let arcusdWei = 0
+    let ustbEth = 0
+    let arcusdEth = 0
     
     output = await sdk.vault.getStakeBalance({
         userAddress: inputEl.value,
@@ -166,11 +168,11 @@ async function getBalances () {
                 arcusdWei = item.value
             }
         })
-        balanceEth = ethers.formatEther(daiWei)
+        daiWei > 0 ? balanceEth = ethers.formatEther(daiWei) : 0
         realDaiBal.textContent = balanceEth
-        const ustbEth = ethers.formatEther(ustbWei)
+        ustbWei > 0 ? ustbEth = ethers.formatEther(ustbWei) : 0
         ustbBal.textContent = ustbEth
-        const arcusdEth = ethers.formatEther(arcusdWei)
+        arcusdWei > 0 ? arcusdEth = ethers.formatEther(arcusdWei) : 0
         arcusdBal.textContent = arcusdEth
     } catch (error) {
         console.log(error)
