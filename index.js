@@ -15,6 +15,7 @@ const eigenlayerOETHBal = document.getElementById("eigenlayer-oeth-bal")
 const realDaiBal = document.getElementById("real-dai-bal")
 const ustbBal = document.getElementById("real-ustb-bal")
 const arcusdBal = document.getElementById("arcana-arcusd-bal")
+const ukreBal = document.getElementById("real-ukre-bal")
 
 // Contract addresses and ABIs
 const genesisAddress = "0xac0f906e433d58fa868f936e8a43230473652885"
@@ -116,8 +117,10 @@ async function getBalances () {
     let daiWei = 0
     let ustbWei = 0
     let arcusdWei = 0
+    let ukreWei = 0
     let ustbEth = 0
     let arcusdEth = 0
+    let ukreEth = 0
     
     output = await sdk.vault.getStakeBalance({
         userAddress: inputEl.value,
@@ -166,6 +169,8 @@ async function getBalances () {
                 ustbWei = item.value
             } else if (item.token.symbol === "arcUSD") {
                 arcusdWei = item.value
+            } else if (item.token.symbol === "UKRE") {
+                ukreWei = item.value
             }
         })
         daiWei > 0 ? balanceEth = ethers.formatEther(daiWei) : 0
@@ -174,6 +179,8 @@ async function getBalances () {
         ustbBal.textContent = ustbEth
         arcusdWei > 0 ? arcusdEth = ethers.formatEther(arcusdWei) : 0
         arcusdBal.textContent = arcusdEth
+        ukreWei > 0 ? ukreEth = ethers.formatEther(ukreWei) : 0
+        ukreBal.textContent = ukreEth
     } catch (error) {
         console.log(error)
     }
