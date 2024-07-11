@@ -1,7 +1,14 @@
 import { StakeWiseSDK, Network } from '@stakewise/v3-sdk'
-import {ethers} from "ethers";
+import { ethers } from "ethers";
 
-const sdk = new StakeWiseSDK({ network: Network.Mainnet })
+// Ethers providers
+const ethProvider = 
+    new ethers.JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/JTXUw4DQJ0PEVskCBSsadhBnk3rkd4vN")
+
+const sdk = new StakeWiseSDK({ 
+    network: Network.Mainnet, 
+    provider: ethProvider
+})
 
 const inputEl = document.getElementById("input-el")
 const updateBtn = document.getElementById("update-btn")
@@ -63,19 +70,12 @@ const eigenlayerABI =
 //     "function balanceOf(address) view returns (uint256)"
 // ]
 
-// Ethers provider objects
-const ethProvider = 
-    new ethers.JsonRpcProvider("https://mainnet.infura.io/v3/ca1b1cda8d6940e6af90ec7b1b8cf84d")
-const polProvider = 
-    new ethers.JsonRpcProvider("https://polygon-mainnet.infura.io/v3/ca1b1cda8d6940e6af90ec7b1b8cf84d")
-
 // Ethers contract objects
 const genesisContract = new ethers.Contract(genesisAddress, stakewiseABI, ethProvider)
 const chorusOneContract = new ethers.Contract(chorusOneAddress, stakewiseABI, ethProvider)
 const osethContract = new ethers.Contract(osETHAddress, osETHABI, ethProvider)
 const eigenlayerPoolContract = new ethers.Contract(eigenlayerPoolAddress, 
                                                     eigenlayerABI, ethProvider)
-// const cashContract = new ethers.Contract(cashAddress, cashABI, polProvider)
 
 // Default wallet address
 const cookie = getCookie("defaultAddress")
