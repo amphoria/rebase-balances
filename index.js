@@ -59,17 +59,6 @@ const eigenlayerABI =
     "function sharesToUnderlyingView(uint256) view returns (uint256)"  
 ]
 
-// Stabl.fi CASH token
-// const cashAddress = "0x5d066d022ede10efa2717ed3d79f22f949f8c175"
-// const cashABI =
-// [
-//     // Some details about the contract
-//     "function name() view returns (string)",
-//     "function decimals() view returns (uint8)",
-//     // Function to get balance of address
-//     "function balanceOf(address) view returns (uint256)"
-// ]
-
 // Ethers contract objects
 const genesisContract = new ethers.Contract(genesisAddress, stakewiseABI, ethProvider)
 const chorusOneContract = new ethers.Contract(chorusOneAddress, stakewiseABI, ethProvider)
@@ -118,6 +107,7 @@ async function getBalances () {
     let ustbWei = 0
     let arcusdWei = 0
     let ukreWei = 0
+    let daiEth = 0
     let ustbEth = 0
     let arcusdEth = 0
     let ukreEth = 0
@@ -173,8 +163,8 @@ async function getBalances () {
                 ukreWei = item.value
             }
         })
-        daiWei > 0 ? balanceEth = ethers.formatEther(daiWei) : 0
-        realDaiBal.textContent = balanceEth
+        daiWei > 0 ? daiEth = ethers.formatEther(daiWei) : 0
+        realDaiBal.textContent = daiEth
         ustbWei > 0 ? ustbEth = ethers.formatEther(ustbWei) : 0
         ustbBal.textContent = ustbEth
         arcusdWei > 0 ? arcusdEth = ethers.formatEther(arcusdWei) : 0
