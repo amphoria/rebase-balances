@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 // Ethers providers
 const ethProvider = 
     new ethers.JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/JTXUw4DQJ0PEVskCBSsadhBnk3rkd4vN")
+const realProvider = new ethers.JsonRpcProvider("https://tangible-real.gateway.tenderly.co/29G4PChJRVFiAJiyQg1FnC")
 
 const sdk = new StakeWiseSDK({ 
     network: Network.Mainnet, 
@@ -23,6 +24,8 @@ const realDaiBal = document.getElementById("real-dai-bal")
 const ustbBal = document.getElementById("real-ustb-bal")
 const arcusdBal = document.getElementById("arcana-arcusd-bal")
 const ukreBal = document.getElementById("real-ukre-bal")
+const realEthBal = document.getElementById("real-eth-bal")
+const realRWABal = document.getElementById("real-rwa-bal")
 
 // Contract addresses and ABIs
 const genesisAddress = "0xac0f906e433d58fa868f936e8a43230473652885"
@@ -59,12 +62,28 @@ const eigenlayerABI =
     "function sharesToUnderlyingView(uint256) view returns (uint256)"  
 ]
 
+// re.al ETH rewards contract
+const realEthAddress = "0xf4e03D77700D42e13Cd98314C518f988Fd6e287a"
+const realEthABI =
+[
+    "function claimable(address) view returns (uint256, uint256[], uint256[], uint256, uint256)"
+]
+
+// re.al RWA rewards contract
+const realRWAAddress = "0x9D146A1C099adEE2444aFD629c04B4cbb5eE1539"
+const realRWAABI =
+[
+    "function claimable(address) view returns (uint256)"
+]
+
 // Ethers contract objects
 const genesisContract = new ethers.Contract(genesisAddress, stakewiseABI, ethProvider)
 const chorusOneContract = new ethers.Contract(chorusOneAddress, stakewiseABI, ethProvider)
 const osethContract = new ethers.Contract(osETHAddress, osETHABI, ethProvider)
 const eigenlayerPoolContract = new ethers.Contract(eigenlayerPoolAddress, 
                                                     eigenlayerABI, ethProvider)
+const realEthContract = new ethers.Contract(realEthAddress, realEthABI, realProvider)
+const realRWAContract = new ethers.Contract(realRWAAddress, realRWAABI, realProvider)
 
 // Default wallet address
 const cookie = getCookie("defaultAddress")
@@ -112,23 +131,31 @@ async function getBalances () {
     let arcusdEth = 0
     let ukreEth = 0
     
-    output = await sdk.vault.getStakeBalance({
-        userAddress: inputEl.value,
-        vaultAddress: genesisAddress
-    })
-    balanceEth = ethers.formatEther(output.assets)
-    stakewiseBal.textContent = balanceEth
+    try {
+        output = await sdk.vault.getStakeBalance({
+            userAddress: inputEl.value,
+            vaultAddress: genesisAddress
+        })
+        balanceEth = ethers.formatEther(output.assets)
+        stakewiseBal.textContent = balanceEth
+    } catch (error) {
+        console.log(error)
+    }
 
     shares = await genesisContract.osTokenPositions(inputEl.value)
     balanceEth = ethers.formatEther(shares)
     genesisOSETHBal.textContent = balanceEth
 
-    output = await sdk.vault.getStakeBalance({
-        userAddress: inputEl.value,
-        vaultAddress: chorusOneAddress
-    })
-    balanceEth = ethers.formatEther(output.assets)
-    chorusOneBal.textContent = balanceEth
+    try {
+        output = await sdk.vault.getStakeBalance({
+            userAddress: inputEl.value,
+            vaultAddress: chorusOneAddress
+        })
+        balanceEth = ethers.formatEther(output.assets)
+        chorusOneBal.textContent = balanceEth
+    } catch (error) {
+        console.log(error)
+    }
 
     shares = await chorusOneContract.osTokenPositions(inputEl.value)
     balanceEth = ethers.formatEther(shares)
@@ -174,6 +201,16 @@ async function getBalances () {
     } catch (error) {
         console.log(error)
     }
+
+    let balWei
+    let balEth
+    const result = await realEthContract.claimable(inputEl.value)
+    balWei = result[0]
+    balEth = ethers.formatEther(balWei)
+    realEthBal.textContent = balEth
+    balWei = await realRWAContract.claimable(inputEl.value)
+    balEth = ethers.formatEther(balWei)
+    realRWABal.textContent = balEth
 }
 
 function saveAddress() {
