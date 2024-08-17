@@ -20,6 +20,7 @@ const chorusOneBal = document.getElementById("chorus-one-bal")
 const chorusOneOSETHBal = document.getElementById("chorus-one-oseth-bal")
 const walletOSETHBal = document.getElementById("wallet-oseth-bal")
 const eigenlayerOETHBal = document.getElementById("eigenlayer-oeth-bal")
+const altlayerAltBal = document.getElementById("altlayer-alt-bal")
 const realDaiBal = document.getElementById("real-dai-bal")
 const ustbBal = document.getElementById("real-ustb-bal")
 const arcusdBal = document.getElementById("arcana-arcusd-bal")
@@ -62,6 +63,19 @@ const eigenlayerABI =
     "function sharesToUnderlyingView(uint256) view returns (uint256)"  
 ]
 
+// reALT Contract
+const reALTAddress = "0xF96798F49936EfB1a56F99Ceae924b6B8359afFb"
+const reALTABI = 
+[
+  // Some details about the contract
+  "function name() view returns (string)",
+  "function decimals() view returns (uint8)",
+  // Function to get balance of address
+  "function balanceOf(address) view returns (uint256)",
+  // Function to get balance of ALT tokens
+  "function convertToAssets(uint256) view returns (uint256)"
+]
+
 // re.al ETH rewards contract
 const realEthAddress = "0xf4e03D77700D42e13Cd98314C518f988Fd6e287a"
 const realEthABI =
@@ -82,6 +96,7 @@ const chorusOneContract = new ethers.Contract(chorusOneAddress, stakewiseABI, et
 const osethContract = new ethers.Contract(osETHAddress, osETHABI, ethProvider)
 const eigenlayerPoolContract = new ethers.Contract(eigenlayerPoolAddress, 
                                                     eigenlayerABI, ethProvider)
+const reALTContract = new ethers.Contract(reALTAddress, reALTABI, ethProvider)
 const realEthContract = new ethers.Contract(realEthAddress, realEthABI, realProvider)
 const realRWAContract = new ethers.Contract(realRWAAddress, realRWAABI, realProvider)
 
@@ -169,6 +184,11 @@ async function getBalances () {
     assets = await eigenlayerPoolContract.sharesToUnderlyingView(shares)
     balanceEth = ethers.formatEther(assets)
     eigenlayerOETHBal.textContent = balanceEth
+
+    shares = await reALTContract.balanceOf(inputEl.value)
+    assets = await reALTContract.convertToAssets(shares)
+    balanceEth = ethers.formatEther(assets)
+    altlayerAltBal.textContent = balanceEth
 
     try {
         const res = await fetch(`https://explorer.re.al/api/v2/addresses/${inputEl.value}/token-balances`)
